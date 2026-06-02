@@ -1,0 +1,17 @@
+[
+  {"name": "Joy Isikhueme", "token": "GUEST_1001", "allowed": 1, "checkedIn": false, "checkinTime": null},
+  {"name": "Seun Mosaku", "token": "GUEST_1002", "allowed": 2, "checkedIn": false, "checkinTime": null},
+  {"name": "Mrs Olatunde Omotayo", "token": "GUEST_1003", "allowed": 1, "checkedIn": false, "checkinTime": null},
+  {"name": "Adaeze Okonkwo", "token": "GUEST_1004", "allowed": 2, "checkedIn": false, "checkinTime": null},
+  {"name": "Chukwuemeka Eze", "token": "GUEST_1005", "allowed": 1, "checkedIn": false, "checkinTime": null},
+  {"name": "Ngozi Adeleke", "token": "GUEST_1006", "allowed": 1, "checkedIn": false, "checkinTime": null},
+  {"name": "Babatunde Osei", "token": "GUEST_1007", "allowed": 2, "checkedIn": false, "checkinTime": null},
+  {"name": "Amaka Chukwu", "token": "GUEST_1008", "allowed": 1, "checkedIn": false, "checkinTime": null},
+  {"name": "Oluwaseun Bello", "token": "GUEST_1009", "allowed": 1, "checkedIn": false, "checkinTime": null},
+  {"name": "Ifeoma Nwachukwu", "token": "GUEST_1010", "allowed": 2, "checkedIn": false, "checkinTime": null},
+  {"name": "Taiwo Adeyemi", "token": "GUEST_1011", "allowed": 1, "checkedIn": false, "checkinTime": null},
+  {"name": "Kehinde Adelabi", "token": "GUEST_1012", "allowed": 2, "checkedIn": false, "checkinTime": null},
+  {"name": "Fatima Musa", "token": "GUEST_1013", "allowed": 1, "checkedIn": false, "checkinTime": null},
+  {"name": "Ibrahim Al-Hassan", "token": "GUEST_1014", "allowed": 1, "checkedIn": false, "checkinTime": null},
+  {"name": "Chioma Obi", "token": "GUEST_1015", "allowed": 2, "checkedIn": false, "checkinTime": null}
+]
