@@ -10,6 +10,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+<script>
+// Runs immediately, before anything renders
+window.__isAdmin = new URLSearchParams(window.location.search).get('admin') === '1';
+// Show correct screen right away — no flash, no waiting for Firebase
+document.addEventListener('DOMContentLoaded', function() {
+  if (window.__isAdmin) {
+    document.getElementById('loadScreen').style.display = 'flex';
+  } else {
+    document.getElementById('usherWaiting').style.display = 'flex';
+  }
+});
+</script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, set, get, update, onValue, off } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -39,19 +51,21 @@ let scanner = null;
 let listFilter = 'all';
 
 // ── ROLE DETECTION ──
-// ?admin=1 in URL = admin view, otherwise usher view
-const urlParams = new URLSearchParams(window.location.search);
-isAdmin = urlParams.get('admin') === '1';
+isAdmin = window.__isAdmin === true;
 
 window.addEventListener('DOMContentLoaded', () => {
-  // Hide everything initially — boot sequence will show the right screen
-  document.getElementById('loadScreen').style.display = 'none';
-  document.getElementById('usherWaiting').style.display = 'none';
-  document.getElementById('app').style.display = 'none';
-
+  // Immediately show the right screen before Firebase responds
   if (isAdmin) {
     document.getElementById('adminBadge').style.display = 'inline-flex';
+    document.getElementById('loadScreen').style.display = 'flex';
+    document.getElementById('usherWaiting').style.display = 'none';
+  } else {
+    document.getElementById('loadScreen').style.display = 'none';
+    document.getElementById('usherWaiting').style.display = 'flex';
   }
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('headerActions').style.display = 'none';
+  document.getElementById('adminControls').style.display = 'none';
 
   checkFirebaseData();
 });
@@ -830,7 +844,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-d
 </div>
 
 <!-- Load screen (admin only) -->
-<div id="loadScreen">
+<div id="loadScreen" style="display:none">
   <div class="load-card">
     <div class="load-icon">💍</div>
     <h2>Admin Setup</h2>
@@ -851,7 +865,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-d
 </div>
 
 <!-- Usher waiting screen -->
-<div id="usherWaiting">
+<div id="usherWaiting" style="display:none">
   <div class="load-card">
     <div class="waiting-icon">⏳</div>
     <h2>Waiting for guest list</h2>
