@@ -44,53 +44,68 @@ const urlParams = new URLSearchParams(window.location.search);
 isAdmin = urlParams.get('admin') === '1';
 
 window.addEventListener('DOMContentLoaded', () => {
+  // Hide everything initially — boot sequence will show the right screen
+  document.getElementById('loadScreen').style.display = 'none';
+  document.getElementById('usherWaiting').style.display = 'none';
+  document.getElementById('app').style.display = 'none';
+
   if (isAdmin) {
     document.getElementById('adminBadge').style.display = 'inline-flex';
-    document.getElementById('adminPanel').style.display = 'block';
-    document.getElementById('usherWaiting').style.display = 'none';
   }
-  // Always try to load existing data from Firebase
+
   checkFirebaseData();
 });
 
 async function checkFirebaseData() {
+  showConnectionStatus('connecting');
   try {
-    showConnectionStatus('connecting');
     const snapshot = await get(ref(db, 'wedding/guests'));
     if (snapshot.exists()) {
+      // Data exists — launch app for everyone (admin or usher)
       const data = snapshot.val();
       guests = Object.values(data);
-      // Restore counter
       checkinOrderCounter = Math.max(0, ...guests.map(g => g.checkinOrder || 0));
       launchApp();
     } else {
       // No data yet
       if (isAdmin) {
+        // Admin needs to upload the guest list
+        document.getElementById('adminPanel').style.display = 'block';
         document.getElementById('loadScreen').style.display = 'flex';
         showConnectionStatus('connected');
       } else {
-        document.getElementById('loadScreen').style.display = 'none';
+        // Usher waits — listen for admin to upload
         document.getElementById('usherWaiting').style.display = 'flex';
         showConnectionStatus('connected');
-        // Poll until admin uploads guest list
         waitForGuestList();
       }
     }
   } catch(e) {
     showConnectionStatus('offline');
-    console.error(e);
+    console.error('Firebase error:', e);
+    // On error show appropriate screen
+    if (isAdmin) {
+      document.getElementById('loadScreen').style.display = 'flex';
+    } else {
+      document.getElementById('usherWaiting').style.display = 'flex';
+      // Keep retrying
+      setTimeout(checkFirebaseData, 5000);
+    }
   }
 }
 
 function waitForGuestList() {
-  const guestRef = ref(db, 'wedding/guests');
-  onValue(guestRef, (snapshot) => {
+  // Use realtime listener — fires immediately if data exists, then on every change
+  onValue(ref(db, 'wedding/guests'), (snapshot) => {
     if (snapshot.exists()) {
       guests = Object.values(snapshot.val());
       checkinOrderCounter = Math.max(0, ...guests.map(g => g.checkinOrder || 0));
       document.getElementById('usherWaiting').style.display = 'none';
       launchApp();
     }
+  }, (error) => {
+    showConnectionStatus('offline');
+    setTimeout(checkFirebaseData, 5000);
   });
 }
 
@@ -188,7 +203,19 @@ function launchApp() {
 function startSync() {
   if (syncListener) off(ref(db, 'wedding/guests'), 'value', syncListener);
   syncListener = onValue(ref(db, 'wedding/guests'), (snapshot) => {
-    if (!snapshot.exists()) return;
+    if (!snapshot.exists()) {
+      // Admin cleared data — send ushers back to waiting screen
+      if (!isAdmin) {
+        guests = [];
+        document.getElementById('app').style.display = 'none';
+        document.getElementById('headerActions').style.display = 'none';
+        document.getElementById('usherWaiting').style.display = 'flex';
+        if (scanner) { scanner.clear().catch(()=>{}); scanner = null; }
+        document.getElementById('reader').innerHTML = '';
+        waitForGuestList();
+      }
+      return;
+    }
     const incoming = Object.values(snapshot.val());
     // Merge: remote is source of truth
     guests = incoming;
