@@ -258,14 +258,17 @@ window.manualCheckIn = async function(token) {
 window.undoCheckIn = function(token) {
   const g = guests.find(x => x.token === token);
   if (!g) return;
-  showConfirm('Undo check-in?', `This will mark ${g.name} as NOT checked in across all devices.`, async () => {
+  document.getElementById('confirmTitle').textContent = 'Undo check-in?';
+  document.getElementById('confirmMsg').textContent = `This will mark ${g.name} as NOT checked in across all devices.`;
+  confirmCallback = async () => {
     const updates = { checkedIn: false, checkinTime: null, checkinOrder: null, manualCheckin: false };
     Object.assign(g, updates);
     updateStats(); updateRecent(); closeModal();
     toast(`↩ ${g.name} check-in reversed`);
     try { await update(ref(db, `wedding/guests/${token}`), updates); }
     catch(e) { toast('⚠️ Sync failed', true); }
-  });
+  };
+  document.getElementById('confirmOverlay').classList.add('show');
 };
 
 // ── ADMIN: RESET ──
@@ -537,8 +540,15 @@ window.showConfirm = function(title,msg,cb) {
   confirmCallback=cb;
   document.getElementById('confirmOverlay').classList.add('show');
 };
-document.getElementById('confirmYes').onclick=()=>{ closeConfirm(); if(confirmCallback) confirmCallback(); };
-window.closeConfirm=function(){ document.getElementById('confirmOverlay').classList.remove('show'); confirmCallback=null; };
+window.closeConfirm = function() {
+  document.getElementById('confirmOverlay').classList.remove('show');
+  confirmCallback=null;
+};
+// Wire confirm button inside module scope
+document.getElementById('confirmYes').addEventListener('click', () => {
+  window.closeConfirm();
+  if (confirmCallback) confirmCallback();
+});
 
 // ── TOAST ──
 let toastTimer;
