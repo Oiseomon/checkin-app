@@ -1,0 +1,26 @@
+{
+  "G_SAMPLE_001": {
+    "name": "John Doe",
+    "token": "G_SAMPLE_001",
+    "allowed": 1,
+    "table": "1",
+    "checkedIn": false,
+    "checkinTime": null
+  },
+  "G_SAMPLE_002": {
+    "name": "Mr and Mrs Sample",
+    "token": "G_SAMPLE_002",
+    "allowed": 2,
+    "table": "2",
+    "checkedIn": false,
+    "checkinTime": null
+  },
+  "G_SAMPLE_003": {
+    "name": "Jane Smith",
+    "token": "G_SAMPLE_003",
+    "allowed": 1,
+    "table": "3",
+    "checkedIn": false,
+    "checkinTime": null
+  }
+}
